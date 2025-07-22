@@ -1,4 +1,4 @@
-const { User: Expense } = require('../models/Expense.model.js');
+const { Expense } = require('../models/Expense.model.js');
 
 const getAllExpenses = async () => {
   const result = await Expense.findAll();
@@ -10,18 +10,42 @@ const getExpense = async (id) => {
   return Expense.findByPk(id);
 };
 
-const createExpense = async (name) => {
-  return Expense.create({ name });
+const createExpense = async ({
+  userId,
+  spentAt,
+  title,
+  amount,
+  category,
+  note,
+}) => {
+  return Expense.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
 };
 
 const removeExpense = async (id) => {
-  return Expense.destroy({ where: { id } });
+  const expenseToRemove = await getExpense(id);
+
+  await Expense.destroy({ where: { id } });
+
+  return expenseToRemove;
 };
 
-const editExpense = async ({ id, body }) => {
+const editExpense = async ({ id, spentAt, title, amount, category, note }) => {
   const user = await getExpense(id);
 
-  const updatedUser = await user.update({ body });
+  const updatedUser = await user.update({
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
 
   return updatedUser;
 };

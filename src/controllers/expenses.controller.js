@@ -17,7 +17,7 @@ async function getExpense(req, res) {
     const expense = await expensesModel.getExpense(expId);
 
     if (!expId || !expense) {
-      return res.status(400).json({ message: `Витрату ${expId} не знайдено` });
+      return res.status(404).json({ message: `Витрату ${expId} не знайдено` });
     }
 
     res.status(200).json(normalizeExpense(expense));
@@ -62,16 +62,26 @@ async function removeExpense(req, res) {
 
 async function updateExpense(req, res) {
   try {
-    const body = req.body;
+    const { spentAt, title, amount, category, note } = req.body;
     const expId = +req.params.expId;
 
-    if (!body) {
+    if (!spentAt || !title || amount || category || note) {
       return res.status(400).json({ error: 'Body is required' });
     } else if (!expId) {
       return res.status(400).json({ error: 'Expense id is required in URL' });
     }
 
-    const updatedExpense = await expensesModel.editExpense(expId, body);
+    const updatedExpense = await expensesModel.editExpense(expId, {
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    });
+
+    if (!updatedExpense) {
+      res.status(404).json({ message: 'Не вдалося отримати витрату' });
+    }
 
     res.status(200).json(normalizeExpense(updatedExpense));
   } catch (err) {

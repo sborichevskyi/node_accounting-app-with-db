@@ -15,10 +15,14 @@ const createUser = async (name) => {
 };
 
 const removeUser = async (id) => {
-  return User.destroy({ where: { id } });
+  const userToRemove = await getUser(id);
+
+  await User.destroy({ where: { id } });
+
+  return userToRemove;
 };
 
-const editUser = async ({ id, name }) => {
+const editUser = async (id, name) => {
   const user = await getUser(id);
 
   const updatedUser = await user.update({ name });
