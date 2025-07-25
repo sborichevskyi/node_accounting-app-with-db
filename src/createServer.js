@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const userRouter = require('./router/users.router');
 const expensesRouter = require('./router/expenses.router');
+const categoriesRouter = require('./router/categories.router');
 
 const createServer = () => {
   const app = express();
@@ -18,6 +19,7 @@ const createServer = () => {
 
   app.use('/users', userRouter);
   app.use('/expenses', expensesRouter);
+  app.use('/categories', categoriesRouter);
 
   return app;
 };

@@ -3,8 +3,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
-const User = sequelize.define(
-  'Users',
+const Category = sequelize.define(
+  'Categories',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -17,11 +17,11 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: 'users',
+    tableName: 'categories',
     timestamps: false,
   },
 );
 
 module.exports = {
-  User,
+  Category,
 };

@@ -74,7 +74,9 @@ async function updateUser(req, res) {
     const updatedUser = await usersModel.editUser(userId, name);
 
     if (!updatedUser) {
-      res.status(404).json({ message: 'Не вдалось отримати користувача' });
+      return res
+        .status(404)
+        .json({ message: 'Не вдалось отримати користувача' });
     }
 
     res.status(200).json(normalizeUser(updatedUser));

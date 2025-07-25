@@ -24,7 +24,7 @@ const Expense = sequelize.define(
       allowNull: false,
     },
     amount: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     category: {
@@ -38,6 +38,7 @@ const Expense = sequelize.define(
   },
   {
     tableName: 'expenses',
+    timestamps: false,
   },
 );
 

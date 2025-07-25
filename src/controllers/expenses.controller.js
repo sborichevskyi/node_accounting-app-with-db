@@ -1,9 +1,11 @@
 const expensesModel = require('../services/expenses.js');
+const usersModel = require('../services/users.js');
 const { normalizeExpense } = require('../services/normalize.js');
 
 async function getAllExpenses(req, res) {
   try {
-    const expenses = await expensesModel.getAllExpenses();
+    const { userId, categories } = req.query;
+    const expenses = await expensesModel.getAllExpenses(userId, categories);
 
     res.status(200).json(expenses.map((exp) => normalizeExpense(exp)));
   } catch (err) {
@@ -28,13 +30,31 @@ async function getExpense(req, res) {
 
 async function createExpense(req, res) {
   try {
-    const body = req.body;
+    const { userId, spentAt, title, amount, category, note } = req.body;
+    const users = await usersModel.getAllUsers();
 
-    if (!body) {
+    if (!users.find((user) => user.id === userId)) {
+      // eslint-disable-next-line no-console
+      console.log(req.body);
+
+      return res.status(400).json({ message: 'Користувача не знайдено' });
+    }
+
+    if (!userId || !spentAt || !title || !amount || !category) {
+      // eslint-disable-next-line no-console
+      console.log(req.body);
+
       return res.status(400).json({ message: 'Не передано тіло запиту' });
     }
 
-    const newExpense = await expensesModel.createExpense(body);
+    const newExpense = await expensesModel.createExpense({
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note: note ?? '',
+    });
 
     if (!newExpense) {
       return res.status(500).json({ message: 'Нову витрату не створено' });
@@ -65,7 +85,7 @@ async function updateExpense(req, res) {
     const { spentAt, title, amount, category, note } = req.body;
     const expId = +req.params.expId;
 
-    if (!spentAt || !title || amount || category || note) {
+    if (!spentAt && !title && !amount && amount === 0 && !category && !note) {
       return res.status(400).json({ error: 'Body is required' });
     } else if (!expId) {
       return res.status(400).json({ error: 'Expense id is required in URL' });
@@ -80,7 +100,7 @@ async function updateExpense(req, res) {
     });
 
     if (!updatedExpense) {
-      res.status(404).json({ message: 'Не вдалося отримати витрату' });
+      return res.status(404).json({ message: 'Не вдалося отримати витрату' });
     }
 
     res.status(200).json(normalizeExpense(updatedExpense));

@@ -1,9 +1,17 @@
 const { Expense } = require('../models/Expense.model.js');
 
-const getAllExpenses = async () => {
-  const result = await Expense.findAll();
+const getAllExpenses = async (userId, categories) => {
+  const where = {};
 
-  return result;
+  if (userId) {
+    where.userId = userId;
+  }
+
+  if (categories) {
+    where.category = Array.isArray(categories) ? categories : [categories];
+  }
+
+  return Expense.findAll({ where });
 };
 
 const getExpense = async (id) => {
@@ -36,10 +44,14 @@ const removeExpense = async (id) => {
   return expenseToRemove;
 };
 
-const editExpense = async ({ id, spentAt, title, amount, category, note }) => {
-  const user = await getExpense(id);
+const editExpense = async (id, { spentAt, title, amount, category, note }) => {
+  const expense = await getExpense(id);
 
-  const updatedUser = await user.update({
+  if (!expense) {
+    return null;
+  }
+
+  const updatedExpense = await expense.update({
     spentAt,
     title,
     amount,
@@ -47,7 +59,7 @@ const editExpense = async ({ id, spentAt, title, amount, category, note }) => {
     note,
   });
 
-  return updatedUser;
+  return updatedExpense;
 };
 
 module.exports = {
